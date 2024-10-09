@@ -1,0 +1,4 @@
+Store all your generated data in this folder, as sub-directories. 
+
+In the paper we mentioned three ways to group the rome taxi trajectories data, here we provide some examples of our grouped data and stored format for your testing and reference.
+You can run the run_example.py to see how we use the grouped data and its output.
