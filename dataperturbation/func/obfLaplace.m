@@ -1,4 +1,4 @@
-function [z_vector, obfuscationMatrix, distance_matrix] = obfLaplace(top_idx_list, approx_id, df_nodes, EPSILON, NR_CANDIDATE)
+function [z_vector, obfuscationMatrix, distance_matrix, approx_idx_target] = obfLaplace(top_idx_list, approx_id, df_nodes, EPSILON, NR_CANDIDATE)
 %% Description:
     % The obfmatrix_generator_laplace is function which generate the
     % obfuscaed location vector
@@ -11,7 +11,7 @@ function [z_vector, obfuscationMatrix, distance_matrix] = obfLaplace(top_idx_lis
 %% Output
     % z_vector: obfuscation vector for that node
 %%
-    approx_id_ = find(approx_id == top_idx_list); 
+    approx_idx_target = find(approx_id == top_idx_list); 
 
     distance_matrix = zeros(NR_CANDIDATE, NR_CANDIDATE); 
     for i = 1:1:NR_CANDIDATE
@@ -36,7 +36,7 @@ function [z_vector, obfuscationMatrix, distance_matrix] = obfLaplace(top_idx_lis
         obfuscationMatrix(i, :) = obfuscationMatrix(i, :)/sum(obfuscationMatrix(i, :));            %changed i to 1
     end
     
-    z_vector = obfuscationMatrix(approx_id_, :);  %changed i to 1
+    z_vector = obfuscationMatrix(approx_idx_target, :);  %changed i to 1
     % scatter(top_loc_list(:, 1), top_loc_list(:, 2), [], z_vector, "filled"); 
 
 

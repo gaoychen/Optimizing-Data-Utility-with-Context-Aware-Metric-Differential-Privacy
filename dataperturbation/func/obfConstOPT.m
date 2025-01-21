@@ -1,7 +1,7 @@
 % function z_vector = obfLP(approx_idx, distance_matrix, cost_matrix, NR_LOC, EPSILON)
-function [z_vector, obfuscationMatrix, distance_matrix] = obfConstOPT(top_idx_list, approx_idx, df_nodes, task_idx, cost_matrix, EPSILON, NR_CANDIDATE)
+function [z_vector, obfuscationMatrix, distance_matrix, approx_idx_target] = obfConstOPT(top_idx_list, approx_idx, df_nodes, task_idx, cost_matrix, EPSILON, NR_CANDIDATE)
 
-    approx_idx = find(approx_idx == top_idx_list); 
+    approx_idx_target = find(approx_idx == top_idx_list); 
     NR_TASK_LOC = size(task_idx, 2); 
 %% Input
 
@@ -88,7 +88,7 @@ function [z_vector, obfuscationMatrix, distance_matrix] = obfConstOPT(top_idx_li
     else
         obfuscationMatrix = reshape(z(1:NR_CANDIDATE*NR_CANDIDATE, 1), NR_CANDIDATE, NR_CANDIDATE);
         obfuscationMatrix = obfuscationMatrix'; 
-        z_vector = obfuscationMatrix(approx_idx, :); 
+        z_vector = obfuscationMatrix(approx_idx_target, :); 
         scatter(top_loc_list(:, 1), top_loc_list(:, 2), [], z_vector, "filled"); 
     end
 

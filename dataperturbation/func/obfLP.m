@@ -1,9 +1,9 @@
 % function z_vector = obfLP(approx_idx, distance_matrix, cost_matrix, NR_LOC, EPSILON)
 
 
-function [z_vector, obfuscationMatrix, distance_matrix] = obfLP(top_idx_list, approx_idx, df_nodes, task_idx, cost_matrix, EPSILON, NR_CANDIDATE)
+function [z_vector, obfuscationMatrix, distance_matrix, approx_idx_target, compute_time] = obfLP(top_idx_list, approx_idx, df_nodes, task_idx, cost_matrix, EPSILON, NR_CANDIDATE)
 
-    approx_idx = find(approx_idx == top_idx_list); 
+    approx_idx_target = find(approx_idx == top_idx_list); 
     NR_TASK_LOC = size(task_idx, 2); 
 %% Input
 % UL_matrix: Utility loss matrix, each UL(i, k) represents the utility loss
@@ -79,17 +79,17 @@ function [z_vector, obfuscationMatrix, distance_matrix] = obfLP(top_idx_list, ap
     ub = ones(NR_CANDIDATE*NR_CANDIDATE, 1);
     % options = optimoptions('linprog','Algorithm','interior-point','Display','off', 'MaxIter', 10000);
     % [z, pfval, exitflag] = linprog(f, GeoI, b_GeoI, A_um, b_um, lb, ub, options);
-
+    tic 
     [z, pfval, exitflag] = linprog(f, GeoI, b_GeoI, A_um, b_um, lb, ub);
     if exitflag ~= 1
         options = optimoptions('linprog','Algorithm','interior-point','Display','off', 'MaxIter', 10000);
         [z, pfval, exitflag] = linprog(f, GeoI, b_GeoI, A_um, b_um, lb, ub, options);
     end
-
+    compute_time = toc; 
     obfuscationMatrix = reshape(z, NR_CANDIDATE, NR_CANDIDATE);
     obfuscationMatrix = obfuscationMatrix'; 
 
-    z_vector = obfuscationMatrix(approx_idx, :); 
+    z_vector = obfuscationMatrix(approx_idx_target, :); 
 
 
 
