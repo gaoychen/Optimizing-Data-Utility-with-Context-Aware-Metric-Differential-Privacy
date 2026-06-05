@@ -11,11 +11,11 @@ function [z_vector, obfuscationMatrix, distance_matrix, approx_idx_target] = obf
     top_loc_list = df_nodes(top_idx_list, 2:3); 
     top_loc_list = top_loc_list{:,:}; 
 
-    distance_matrix = sparse(NR_CANDIDATE, NR_CANDIDATE); 
+    distance_matrix = zeros(NR_CANDIDATE, NR_CANDIDATE); 
     for i = 1:1:NR_CANDIDATE
         for j = 1:1:NR_CANDIDATE
-            loc_1 = df_nodes(i, 2:3); 
-            loc_2 = df_nodes(j, 2:3); 
+            loc_1 = df_nodes(top_idx_list(1, i), 2:3); 
+            loc_2 = df_nodes(top_idx_list(1, j), 2:3); 
             loc_1 = loc_1{1, :};
             loc_2 = loc_2{1, :};
 
@@ -59,15 +59,17 @@ function [z_vector, obfuscationMatrix, distance_matrix, approx_idx_target] = obf
     end  
 
     b_um = ones(NR_CANDIDATE, 1);
-
+    
+    %% 
     for i = 1:1:NR_CANDIDATE
         for j = 1:1:NR_CANDIDATE
-            A_Y((i-1)*NR_CANDIDATE + j, (i-1)*NR_CANDIDATE + j) = 1;
-            A_Y((i-1)*NR_CANDIDATE + j, NR_CANDIDATE*NR_CANDIDATE + j) = -exp(EPSILON*distance_matrix(i, j));
-        end
-        
+            if distance_matrix(i, j) > 0.3
+                A_Y((i-1)*NR_CANDIDATE + j, (i-1)*NR_CANDIDATE + j) = 1;
+                A_Y((i-1)*NR_CANDIDATE + j, NR_CANDIDATE*NR_CANDIDATE + j) = -exp(EPSILON*distance_matrix(i, j));
+            end
+        end    
     end  
-    b_Y = zeros(NR_CANDIDATE*NR_CANDIDATE, 1);  
+    b_Y = zeros(size(A_Y, 1), 1);  
 
 
     %% Upper bound and lower bound of the decision variables

@@ -1,7 +1,11 @@
-function [cost_matrix, cost_matrix_noMB, cost_matrix_MB] = cost_matrix_calculation(G, top_idx_list, task_idx, loc_frequency_noMB, loc_frequency_MB, NR_LOC, NR_CANDIDATE, NR_TASK_LOC)
+function [cost_matrix, cost_matrix_noMB, cost_matrix_MB, cost_matrix_Mkv2, cost_matrix_ground] ... 
+    = cost_matrix_calculation(G, top_idx_list, task_idx, loc_frequency_noMB, loc_frequency_MB, loc_frequency_Mkv2, loc_frequency_ground, NR_LOC, NR_CANDIDATE, NR_TASK_LOC)
     cost_matrix_MB = zeros(NR_LOC, NR_CANDIDATE, NR_CANDIDATE); 
     cost_matrix_noMB = zeros(NR_LOC, NR_CANDIDATE, NR_CANDIDATE); 
     cost_matrix = zeros(NR_LOC, NR_CANDIDATE, NR_CANDIDATE); 
+    cost_matrix_Mkv2 = zeros(NR_LOC, NR_CANDIDATE, NR_CANDIDATE);
+    cost_matrix_ground = zeros(NR_LOC, NR_CANDIDATE, NR_CANDIDATE);
+
 
     NR_VEHICLE = 5;
     available_vehicle_loc = randperm(NR_CANDIDATE, NR_VEHICLE);
@@ -33,6 +37,8 @@ function [cost_matrix, cost_matrix_noMB, cost_matrix_MB] = cost_matrix_calculati
                     cost_matrix(k, i, j) = cost_matrix(k, i, j) + utility_loss/NR_TASK_LOC;
                     cost_matrix_noMB(k, i, j) = cost_matrix_noMB(k, i, j) + loc_frequency_noMB(k, top_idx_list(k, i))*utility_loss/NR_TASK_LOC; 
                     cost_matrix_MB(k, i, j) = cost_matrix_MB(k, i, j) + loc_frequency_MB(k, top_idx_list(k, i))*utility_loss/NR_TASK_LOC; 
+                    cost_matrix_Mkv2(k, i, j) = cost_matrix_Mkv2(k, i, j) + loc_frequency_Mkv2(k, top_idx_list(k, i))*utility_loss/NR_TASK_LOC; 
+                    cost_matrix_ground(k, i, j) = cost_matrix_ground(k, i, j) + loc_frequency_ground(k, top_idx_list(k, i))*utility_loss/NR_TASK_LOC; 
                 end          
             end
         end    

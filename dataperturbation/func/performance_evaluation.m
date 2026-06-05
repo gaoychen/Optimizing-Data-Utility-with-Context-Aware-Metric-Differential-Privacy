@@ -32,6 +32,6 @@ function [maxPL, meanPL, expected_inference_error, success_rate, success_rate_, 
     success_rate = success_rate/SAMPLE_SIZE; 
     success_rate_ = success_rate_/SAMPLE_SIZE; 
     expected_inference_error = expected_inference_error/SAMPLE_SIZE;  
-    expected_utility_loss = sum(squeeze(cost_matrix(i, approx_idx_target, :))'.*z_vector); 
+    expected_utility_loss = sum(sum(cost_matrix.*obfuscationMatrix)); 
     
 end

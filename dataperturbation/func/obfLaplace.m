@@ -16,8 +16,8 @@ function [z_vector, obfuscationMatrix, distance_matrix, approx_idx_target] = obf
     distance_matrix = zeros(NR_CANDIDATE, NR_CANDIDATE); 
     for i = 1:1:NR_CANDIDATE
         for j = 1:1:NR_CANDIDATE
-            loc_1 = df_nodes(i, 2:3); 
-            loc_2 = df_nodes(j, 2:3); 
+            loc_1 = df_nodes(top_idx_list(1, i), 2:3); 
+            loc_2 = df_nodes(top_idx_list(1, j), 2:3); 
             loc_1 = loc_1{1, :};
             loc_2 = loc_2{1, :};
 

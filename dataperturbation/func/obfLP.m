@@ -1,7 +1,8 @@
 % function z_vector = obfLP(approx_idx, distance_matrix, cost_matrix, NR_LOC, EPSILON)
 
 
-function [z_vector, obfuscationMatrix, distance_matrix, approx_idx_target, compute_time] = obfLP(top_idx_list, approx_idx, df_nodes, task_idx, cost_matrix, EPSILON, NR_CANDIDATE)
+function [z_vector, obfuscationMatrix, distance_matrix, approx_idx_target, compute_time] ... 
+    = obfLP(top_idx_list, approx_idx, df_nodes, task_idx, cost_matrix, approx_idx_past, EPSILON, NR_CANDIDATE, ETA)
 
     approx_idx_target = find(approx_idx == top_idx_list); 
     NR_TASK_LOC = size(task_idx, 2); 
@@ -18,8 +19,19 @@ function [z_vector, obfuscationMatrix, distance_matrix, approx_idx_target, compu
     distance_matrix = zeros(NR_CANDIDATE, NR_CANDIDATE); 
     for i = 1:1:NR_CANDIDATE
         for j = 1:1:NR_CANDIDATE
-            loc_1 = df_nodes(i, 2:3); 
-            loc_2 = df_nodes(j, 2:3); 
+            if approx_idx == top_idx_list(1, i)
+                idx_past = approx_idx_past(approx_idx_target, :); 
+                loc_1 = mean(df_nodes(idx_past', 2:3));
+            else
+                loc_1 = df_nodes(top_idx_list(1, i), 2:3);
+            end
+
+            if approx_idx == top_idx_list(1, j)
+                idx_past = approx_idx_past(approx_idx_target, :); 
+                loc_2 = mean(df_nodes(idx_past', 2:3));
+            else
+                loc_2 = df_nodes(top_idx_list(1, j), 2:3); 
+            end
             loc_1 = loc_1{1, :};
             loc_2 = loc_2{1, :};
 
@@ -45,12 +57,14 @@ function [z_vector, obfuscationMatrix, distance_matrix, approx_idx_target, compu
     for i = 1:1:NR_CANDIDATE
         for j = i+1:1:NR_CANDIDATE    
             for k = 1:1:NR_CANDIDATE
-                GeoI(idx, (i-1)*NR_CANDIDATE + k) = 1;
-                GeoI(idx, (j-1)*NR_CANDIDATE + k) = -exp(EPSILON*distance_matrix(i, j));
-                idx = idx + 1;
-                GeoI(idx, (i-1)*NR_CANDIDATE + k) = -exp(EPSILON*distance_matrix(i, j));
-                GeoI(idx, (j-1)*NR_CANDIDATE + k) = 1;
-                idx = idx + 1;
+                if distance_matrix(i, j) <= ETA
+                    GeoI(idx, (i-1)*NR_CANDIDATE + k) = 1;
+                    GeoI(idx, (j-1)*NR_CANDIDATE + k) = -exp(EPSILON*distance_matrix(i, j));
+                    idx = idx + 1;
+                    GeoI(idx, (i-1)*NR_CANDIDATE + k) = -exp(EPSILON*distance_matrix(i, j));
+                    GeoI(idx, (j-1)*NR_CANDIDATE + k) = 1;
+                    idx = idx + 1;
+                end
             end
         end
     end
@@ -80,9 +94,21 @@ function [z_vector, obfuscationMatrix, distance_matrix, approx_idx_target, compu
     % options = optimoptions('linprog','Algorithm','interior-point','Display','off', 'MaxIter', 10000);
     % [z, pfval, exitflag] = linprog(f, GeoI, b_GeoI, A_um, b_um, lb, ub, options);
     tic 
-    [z, pfval, exitflag] = linprog(f, GeoI, b_GeoI, A_um, b_um, lb, ub);
+    try
+        [z, pfval, exitflag] = linprog(f, GeoI, b_GeoI, A_um, b_um, lb, ub);
+    catch ME
+        % If LINPROG crashes, this block executes automatically
+        % warning(E.identifier, 'Dual-simplex failed with error: %s. \nSwitching to Interior-Point...', ME.message);
+    
+        % Update options to Interior-Point
+        options = optimoptions('linprog','Algorithm','interior-point','Display','off', 'MaxIter', 1000);
+        [z, pfval, exitflag] = linprog(f, GeoI, b_GeoI, A_um, b_um, lb, ub, options);
+    end
+
+
+
     if exitflag ~= 1
-        options = optimoptions('linprog','Algorithm','interior-point','Display','off', 'MaxIter', 10000);
+        options = optimoptions('linprog','Algorithm','interior-point','Display','off', 'MaxIter', 1000);
         [z, pfval, exitflag] = linprog(f, GeoI, b_GeoI, A_um, b_um, lb, ub, options);
     end
     compute_time = toc; 
